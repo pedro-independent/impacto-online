@@ -192,6 +192,34 @@ function initStickyTitleScroll() {
 initStickyTitleScroll();
 
 /* Benefits sticky cards */
+const imgItems = gsap.utils.toArray('.home-scroll_img-item');
+const textItems = gsap.utils.toArray('.home-scroll_text-item');
+
+// Set all image items to hidden except the first one
+imgItems.forEach((img, i) => {
+  gsap.set(img, { opacity: i === 0 ? 1 : 0, y: 0 });
+});
+
+textItems.forEach((text, i) => {
+  ScrollTrigger.create({
+    trigger: text,
+    start: 'top center',
+    end: 'bottom center',
+    onEnter: () => showImage(i),
+    onEnterBack: () => showImage(i),
+  });
+});
+
+function showImage(index) {
+  imgItems.forEach((img, i) => {
+    gsap.to(img, {
+      opacity: i === index ? 1 : 0,
+      y: i === index ? 0 : -50,
+      duration: 0.6,
+      ease: 'power2.out'
+    });
+  });
+}
 
 
 /* Testimonials Marquee */
@@ -352,3 +380,28 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+/* Accordion FAQ */
+function initAccordionCSS() {
+  document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
+    const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
+
+    accordion.addEventListener('click', (event) => {
+      const toggle = event.target.closest('[data-accordion-toggle]');
+      if (!toggle) return; // Exit if the clicked element is not a toggle
+
+      const singleAccordion = toggle.closest('[data-accordion-status]');
+      if (!singleAccordion) return; // Exit if no accordion container is found
+
+      const isActive = singleAccordion.getAttribute('data-accordion-status') === 'active';
+      singleAccordion.setAttribute('data-accordion-status', isActive ? 'not-active' : 'active');
+      
+      // When [data-accordion-close-siblings="true"]
+      if (closeSiblings && !isActive) {
+        accordion.querySelectorAll('[data-accordion-status="active"]').forEach((sibling) => {
+          if (sibling !== singleAccordion) sibling.setAttribute('data-accordion-status', 'not-active');
+        });
+      }
+    });
+  });
+}
+  initAccordionCSS();
