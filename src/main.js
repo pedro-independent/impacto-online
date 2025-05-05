@@ -81,8 +81,9 @@ const tl = gsap.timeline({
     trigger: ".section_about",
     start: "top top",
     end: "+=100%",
-    scrub: true,
+    scrub: 1,
     pin: true,
+    //markers: true,
   }
 });
 
