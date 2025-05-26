@@ -1,33 +1,33 @@
-import './styles/style.css'
-import SplitType from 'split-type'
-
+import "./styles/style.css";
+import SplitType from "split-type";
 
 /* Check Section Theme on scroll */
 function initCheckSectionThemeScroll() {
-
-
-  const navBarHeight = document.querySelector("[data-nav-bar-height]")
+  const navBarHeight = document.querySelector("[data-nav-bar-height]");
   const themeObserverOffset = navBarHeight ? navBarHeight.offsetHeight / 2 : 0;
 
   function checkThemeSection() {
     const themeSections = document.querySelectorAll("[data-theme-section]");
 
-    themeSections.forEach(function(themeSection) {
+    themeSections.forEach(function (themeSection) {
       const rect = themeSection.getBoundingClientRect();
       const themeSectionTop = rect.top;
       const themeSectionBottom = rect.bottom;
 
-      if (themeSectionTop <= themeObserverOffset && themeSectionBottom >= themeObserverOffset) {
-      
-        const themeSectionActive = themeSection.getAttribute("data-theme-section");
-        document.querySelectorAll("[data-theme-nav]").forEach(function(elem) {
+      if (
+        themeSectionTop <= themeObserverOffset &&
+        themeSectionBottom >= themeObserverOffset
+      ) {
+        const themeSectionActive =
+          themeSection.getAttribute("data-theme-section");
+        document.querySelectorAll("[data-theme-nav]").forEach(function (elem) {
           if (elem.getAttribute("data-theme-nav") !== themeSectionActive) {
             elem.setAttribute("data-theme-nav", themeSectionActive);
           }
         });
 
         const bgSectionActive = themeSection.getAttribute("data-bg-section");
-        document.querySelectorAll("[data-bg-nav]").forEach(function(elem) {
+        document.querySelectorAll("[data-bg-nav]").forEach(function (elem) {
           if (elem.getAttribute("data-bg-nav") !== bgSectionActive) {
             elem.setAttribute("data-bg-nav", bgSectionActive);
           }
@@ -44,36 +44,58 @@ function initCheckSectionThemeScroll() {
   startThemeCheck();
 }
 
-  initCheckSectionThemeScroll();
-
+initCheckSectionThemeScroll();
 
 /* Buttons */
 function initButtonCharacterStagger() {
-    const offsetIncrement = 0.01;
-    const buttons = document.querySelectorAll('[data-button-animate]');
-  
-    buttons.forEach(button => {
-      const text = button.textContent;
-      button.innerHTML = '';
-  
-      [...text].forEach((char, index) => {
-        const span = document.createElement('span');
-        span.textContent = char;
-        span.style.transitionDelay = `${index * offsetIncrement}s`;
-  
-        if (char === ' ') {
-          span.style.whiteSpace = 'pre';
-        }
-  
-        button.appendChild(span);
-      });
+  const offsetIncrement = 0.01;
+  const buttons = document.querySelectorAll("[data-button-animate]");
+
+  buttons.forEach((button) => {
+    const text = button.textContent;
+    button.innerHTML = "";
+
+    [...text].forEach((char, index) => {
+      const span = document.createElement("span");
+      span.textContent = char;
+      span.style.transitionDelay = `${index * offsetIncrement}s`;
+
+      if (char === " ") {
+        span.style.whiteSpace = "pre";
+      }
+
+      button.appendChild(span);
     });
-  }
-  
+  });
+}
+
 initButtonCharacterStagger();
 
+/* Register GSAP */
+gsap.registerPlugin(SplitText, ScrollTrigger);
 
-gsap.registerPlugin(ScrollTrigger)
+/* Split Headings for reveal on scroll */
+let headings = document.querySelectorAll('[data-split="heading"]');
+headings.forEach((heading) => {
+  SplitText.create(heading, {
+    type: "lines",
+    autoSplit: true,
+    mask: "lines",
+    onSplit(instance) {
+      return gsap.from(instance.lines, {
+        duration: 0.5,
+        yPercent: 110,
+        stagger: 0.2,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: heading,
+          start: "top 75%",
+          once: true,
+        },
+      });
+    },
+  });
+});
 
 /* About animation */
 const tl = gsap.timeline({
@@ -84,55 +106,74 @@ const tl = gsap.timeline({
     scrub: 1,
     pin: true,
     //markers: true,
-  }
+  },
 });
 
-tl.fromTo(".about-wrap", 
-  { scale: 0.4 }, 
-  { scale: 1, ease: "power2.out" }
+tl.fromTo(".about-wrap", { scale: 0.4 }, { scale: 1, ease: "power2.out" });
+
+tl.to(
+  ".about-img-wrap.is--one",
+  {
+    rotate: -3,
+    xPercent: -150,
+    yPercent: -200,
+    ease: "power2.out",
+  },
+  "<"
 );
 
-tl.to(".about-img-wrap.is--one", {
-  rotate: -3,
-  xPercent: -150,
-  yPercent: -200,
-  ease: "power2.out"
-}, "<");
+tl.to(
+  ".about-img-wrap.is--two",
+  {
+    rotate: 3,
+    xPercent: 105,
+    yPercent: -170,
+    ease: "power2.out",
+  },
+  "<"
+);
 
-tl.to(".about-img-wrap.is--two", {
-  rotate: 3,
-  xPercent: 105,
-  yPercent: -170,
-  ease: "power2.out"
-}, "<");
+tl.to(
+  ".about-img-wrap.is--three",
+  {
+    rotate: -6,
+    xPercent: 150,
+    yPercent: 100,
+    ease: "power2.out",
+  },
+  "<"
+);
 
-tl.to(".about-img-wrap.is--three", {
-  rotate: -6,
-  xPercent: 150,
-  yPercent: 100,
-  ease: "power2.out"
-}, "<");
+tl.to(
+  ".about-img-wrap.is--four",
+  {
+    rotate: 2,
+    xPercent: -185,
+    yPercent: 100,
+    ease: "power2.out",
+  },
+  "<"
+);
 
-tl.to(".about-img-wrap.is--four", {
-  rotate: 2,
-  xPercent: -185,
-  yPercent: 100,
-  ease: "power2.out"
-}, "<");
-
-tl.to(".about-img-wrap.is--five", {
-  rotate: -2.5,
-  xPercent: -250,
-  yPercent: -50,
-  ease: "power2.out"
-}, "<");
+tl.to(
+  ".about-img-wrap.is--five",
+  {
+    rotate: -2.5,
+    xPercent: -250,
+    yPercent: -50,
+    ease: "power2.out",
+  },
+  "<"
+);
 
 /* Why animation */
 function initStickyTitleScroll() {
   const wraps = document.querySelectorAll('[data-sticky-title="wrap"]');
 
-  wraps.forEach(wrap => {
-    const headings = Array.from(wrap.querySelectorAll('[data-sticky-title="heading"]'));
+  wraps.forEach((wrap) => {
+    const headings = Array.from(
+      wrap.querySelectorAll('[data-sticky-title="heading"]')
+    );
 
     const masterTl = gsap.timeline({
       scrollTrigger: {
@@ -140,12 +181,12 @@ function initStickyTitleScroll() {
         start: "top 40%",
         end: "bottom bottom",
         scrub: true,
-      }
+      },
     });
 
     const revealDuration = 1,
-          fadeOutDuration = 0.5,
-          overlapOffset = 0.15;
+      fadeOutDuration = 0.5,
+      overlapOffset = 0.15;
 
     headings.forEach((heading, index) => {
       // Set aria-label for accessibility
@@ -153,12 +194,12 @@ function initStickyTitleScroll() {
 
       // Split text using SplitType
       const split = new SplitType(heading, {
-        types: 'words, chars',
-        tagName: 'span'
+        types: "words, chars",
+        tagName: "span",
       });
 
       // Hide all the chars from screen readers
-      split.chars.forEach(char => char.setAttribute("aria-hidden", "true"));
+      split.chars.forEach((char) => char.setAttribute("aria-hidden", "true"));
 
       // Make sure the original heading is visible
       gsap.set(heading, { visibility: "visible" });
@@ -169,7 +210,7 @@ function initStickyTitleScroll() {
       headingTl.from(split.chars, {
         autoAlpha: 0,
         stagger: { amount: revealDuration, from: "start" },
-        duration: revealDuration
+        duration: revealDuration,
       });
 
       // Fade-out animation for all but the last one
@@ -177,7 +218,7 @@ function initStickyTitleScroll() {
         headingTl.to(split.chars, {
           autoAlpha: 0,
           stagger: { amount: fadeOutDuration, from: "end" },
-          duration: fadeOutDuration
+          duration: fadeOutDuration,
         });
       }
 
@@ -193,8 +234,8 @@ function initStickyTitleScroll() {
 initStickyTitleScroll();
 
 /* Benefits sticky cards */
-const imgItems = gsap.utils.toArray('.home-scroll_img-item');
-const textItems = gsap.utils.toArray('.home-scroll_text-item');
+const imgItems = gsap.utils.toArray(".home-scroll_img-item");
+const textItems = gsap.utils.toArray(".home-scroll_text-item");
 
 // Set all image items to hidden except the first one
 imgItems.forEach((img, i) => {
@@ -204,8 +245,8 @@ imgItems.forEach((img, i) => {
 textItems.forEach((text, i) => {
   ScrollTrigger.create({
     trigger: text,
-    start: 'top center',
-    end: 'bottom center',
+    start: "top center",
+    end: "bottom center",
     onEnter: () => showImage(i),
     onEnterBack: () => showImage(i),
   });
@@ -217,84 +258,114 @@ function showImage(index) {
       opacity: i === index ? 1 : 0,
       y: i === index ? 0 : -50,
       duration: 0.6,
-      ease: 'power2.out'
+      ease: "power2.out",
     });
   });
 }
-
 
 /* Testimonials Marquee */
 function initMarqueeScrollDirection() {
-  document.querySelectorAll('[data-marquee-scroll-direction-target]').forEach((marquee) => {
-    const marqueeContent = marquee.querySelector('[data-marquee-collection-target]');
-    const marqueeScroll = marquee.querySelector('[data-marquee-scroll-target]');
-    if (!marqueeContent || !marqueeScroll) return;
+  document
+    .querySelectorAll("[data-marquee-scroll-direction-target]")
+    .forEach((marquee) => {
+      const marqueeContent = marquee.querySelector(
+        "[data-marquee-collection-target]"
+      );
+      const marqueeScroll = marquee.querySelector(
+        "[data-marquee-scroll-target]"
+      );
+      if (!marqueeContent || !marqueeScroll) return;
 
-    const { marqueeSpeed: speed, marqueeDirection: direction, marqueeDuplicate: duplicate, marqueeScrollSpeed: scrollSpeed } = marquee.dataset;
+      const {
+        marqueeSpeed: speed,
+        marqueeDirection: direction,
+        marqueeDuplicate: duplicate,
+        marqueeScrollSpeed: scrollSpeed,
+      } = marquee.dataset;
 
-    const marqueeSpeedAttr = parseFloat(speed);
-    const marqueeDirectionAttr = direction === 'right' ? 1 : -1;
-    const duplicateAmount = parseInt(duplicate || 0);
-    const scrollSpeedAttr = parseFloat(scrollSpeed);
-    const speedMultiplier = window.innerWidth < 479 ? 0.25 : window.innerWidth < 991 ? 0.5 : 1;
+      const marqueeSpeedAttr = parseFloat(speed);
+      const marqueeDirectionAttr = direction === "right" ? 1 : -1;
+      const duplicateAmount = parseInt(duplicate || 0);
+      const scrollSpeedAttr = parseFloat(scrollSpeed);
+      const speedMultiplier =
+        window.innerWidth < 479 ? 0.25 : window.innerWidth < 991 ? 0.5 : 1;
 
-    let marqueeSpeed = marqueeSpeedAttr * (marqueeContent.offsetWidth / window.innerWidth) * speedMultiplier;
+      let marqueeSpeed =
+        marqueeSpeedAttr *
+        (marqueeContent.offsetWidth / window.innerWidth) *
+        speedMultiplier;
 
-    marqueeScroll.style.marginLeft = `${scrollSpeedAttr * -1}%`;
-    marqueeScroll.style.width = `${(scrollSpeedAttr * 2) + 100}%`;
+      marqueeScroll.style.marginLeft = `${scrollSpeedAttr * -1}%`;
+      marqueeScroll.style.width = `${scrollSpeedAttr * 2 + 100}%`;
 
-    if (duplicateAmount > 0) {
-      const fragment = document.createDocumentFragment();
-      for (let i = 0; i < duplicateAmount; i++) {
-        fragment.appendChild(marqueeContent.cloneNode(true));
+      if (duplicateAmount > 0) {
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < duplicateAmount; i++) {
+          fragment.appendChild(marqueeContent.cloneNode(true));
+        }
+        marqueeScroll.appendChild(fragment);
       }
-      marqueeScroll.appendChild(fragment);
-    }
 
-    const marqueeItems = marquee.querySelectorAll('[data-marquee-collection-target]');
-    const animation = gsap.to(marqueeItems, {
-      xPercent: -100,
-      repeat: -1,
-      duration: marqueeSpeed,
-      ease: 'linear'
-    }).totalProgress(0.5);
+      const marqueeItems = marquee.querySelectorAll(
+        "[data-marquee-collection-target]"
+      );
+      const animation = gsap
+        .to(marqueeItems, {
+          xPercent: -100,
+          repeat: -1,
+          duration: marqueeSpeed,
+          ease: "linear",
+        })
+        .totalProgress(0.5);
 
-    gsap.set(marqueeItems, { xPercent: marqueeDirectionAttr === 1 ? 100 : -100 });
-    animation.timeScale(marqueeDirectionAttr);
-    animation.play();
+      gsap.set(marqueeItems, {
+        xPercent: marqueeDirectionAttr === 1 ? 100 : -100,
+      });
+      animation.timeScale(marqueeDirectionAttr);
+      animation.play();
 
-    marquee.setAttribute('data-marquee-status', 'normal');
+      marquee.setAttribute("data-marquee-status", "normal");
 
-    ScrollTrigger.create({
-      trigger: marquee,
-      start: 'top bottom',
-      end: 'bottom top',
-      onUpdate: (self) => {
-        const isInverted = self.direction === 1;
-        const currentDirection = isInverted ? -marqueeDirectionAttr : marqueeDirectionAttr;
-
-        animation.timeScale(currentDirection);
-        marquee.setAttribute('data-marquee-status', isInverted ? 'normal' : 'inverted');
-      }
-    });
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
+      ScrollTrigger.create({
         trigger: marquee,
-        start: '0% 100%',
-        end: '100% 0%',
-        scrub: 0
-      }
+        start: "top bottom",
+        end: "bottom top",
+        onUpdate: (self) => {
+          const isInverted = self.direction === 1;
+          const currentDirection = isInverted
+            ? -marqueeDirectionAttr
+            : marqueeDirectionAttr;
+
+          animation.timeScale(currentDirection);
+          marquee.setAttribute(
+            "data-marquee-status",
+            isInverted ? "normal" : "inverted"
+          );
+        },
+      });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: marquee,
+          start: "0% 100%",
+          end: "100% 0%",
+          scrub: 0,
+        },
+      });
+
+      const scrollStart =
+        marqueeDirectionAttr === -1 ? scrollSpeedAttr : -scrollSpeedAttr;
+      const scrollEnd = -scrollStart;
+
+      tl.fromTo(
+        marqueeScroll,
+        { x: `${scrollStart}vw` },
+        { x: `${scrollEnd}vw`, ease: "none" }
+      );
     });
-
-    const scrollStart = marqueeDirectionAttr === -1 ? scrollSpeedAttr : -scrollSpeedAttr;
-    const scrollEnd = -scrollStart;
-
-    tl.fromTo(marqueeScroll, { x: `${scrollStart}vw` }, { x: `${scrollEnd}vw`, ease: 'none' });
-  });
 }
 
-  initMarqueeScrollDirection();
+initMarqueeScrollDirection();
 
 /* Team Overlay */
 const teamItems = document.querySelectorAll(".team-item");
@@ -322,7 +393,7 @@ function hideOverlay() {
         gsap.set(overlay, { display: "none" });
         gsap.set(activeBio, { clearProps: "y" });
         closeModal();
-      }
+      },
     });
   } else {
     gsap.set(overlay, { display: "none" });
@@ -330,7 +401,7 @@ function hideOverlay() {
   }
 }
 
-teamItems.forEach(item => {
+teamItems.forEach((item) => {
   item.addEventListener("click", () => {
     const name = item.getAttribute("data-name");
     const allBios = overlay.querySelectorAll(".team-bio-item");
@@ -338,18 +409,20 @@ teamItems.forEach(item => {
     gsap.set(overlay, { display: "block" });
     openModal();
 
-    allBios.forEach(bio => {
+    allBios.forEach((bio) => {
       gsap.set(bio, { y: "100vh" });
       bio.classList.remove("active");
     });
 
-    const targetBio = overlay.querySelector(`.team-bio-item[data-name="${name}"]`);
+    const targetBio = overlay.querySelector(
+      `.team-bio-item[data-name="${name}"]`
+    );
     if (targetBio) {
       targetBio.classList.add("active");
       gsap.to(targetBio, {
         y: 0,
         duration: 0.75,
-        ease: "power3.out"
+        ease: "power3.out",
       });
     }
   });
@@ -371,10 +444,10 @@ overlay.addEventListener("click", (e) => {
   }
 });
 
-
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
-    const isOverlayVisible = window.getComputedStyle(overlay).display !== "none";
+    const isOverlayVisible =
+      window.getComputedStyle(overlay).display !== "none";
     if (isOverlayVisible) {
       hideOverlay();
     }
@@ -383,26 +456,36 @@ document.addEventListener("keydown", (e) => {
 
 /* Accordion FAQ */
 function initAccordionCSS() {
-  document.querySelectorAll('[data-accordion-css-init]').forEach((accordion) => {
-    const closeSiblings = accordion.getAttribute('data-accordion-close-siblings') === 'true';
+  document
+    .querySelectorAll("[data-accordion-css-init]")
+    .forEach((accordion) => {
+      const closeSiblings =
+        accordion.getAttribute("data-accordion-close-siblings") === "true";
 
-    accordion.addEventListener('click', (event) => {
-      const toggle = event.target.closest('[data-accordion-toggle]');
-      if (!toggle) return; // Exit if the clicked element is not a toggle
+      accordion.addEventListener("click", (event) => {
+        const toggle = event.target.closest("[data-accordion-toggle]");
+        if (!toggle) return; // Exit if the clicked element is not a toggle
 
-      const singleAccordion = toggle.closest('[data-accordion-status]');
-      if (!singleAccordion) return; // Exit if no accordion container is found
+        const singleAccordion = toggle.closest("[data-accordion-status]");
+        if (!singleAccordion) return; // Exit if no accordion container is found
 
-      const isActive = singleAccordion.getAttribute('data-accordion-status') === 'active';
-      singleAccordion.setAttribute('data-accordion-status', isActive ? 'not-active' : 'active');
-      
-      // When [data-accordion-close-siblings="true"]
-      if (closeSiblings && !isActive) {
-        accordion.querySelectorAll('[data-accordion-status="active"]').forEach((sibling) => {
-          if (sibling !== singleAccordion) sibling.setAttribute('data-accordion-status', 'not-active');
-        });
-      }
+        const isActive =
+          singleAccordion.getAttribute("data-accordion-status") === "active";
+        singleAccordion.setAttribute(
+          "data-accordion-status",
+          isActive ? "not-active" : "active"
+        );
+
+        // When [data-accordion-close-siblings="true"]
+        if (closeSiblings && !isActive) {
+          accordion
+            .querySelectorAll('[data-accordion-status="active"]')
+            .forEach((sibling) => {
+              if (sibling !== singleAccordion)
+                sibling.setAttribute("data-accordion-status", "not-active");
+            });
+        }
+      });
     });
-  });
 }
-  initAccordionCSS();
+initAccordionCSS();
