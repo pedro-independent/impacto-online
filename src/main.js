@@ -234,34 +234,45 @@ function initStickyTitleScroll() {
 initStickyTitleScroll();
 
 /* Benefits sticky cards */
-const imgItems = gsap.utils.toArray(".home-scroll_img-item");
-const textItems = gsap.utils.toArray(".home-scroll_text-item");
+const images = gsap.utils.toArray('.benefits-img');
+            const texts = gsap.utils.toArray('.benefits-text-item');
 
-// Set all image items to hidden except the first one
-imgItems.forEach((img, i) => {
-  gsap.set(img, { opacity: i === 0 ? 1 : 0, y: 0 });
-});
+            gsap.set(texts.slice(1), { opacity: 0, y: '2rem' });
+            gsap.set(texts[0], { opacity: 1, y: '0rem' });
+            gsap.set(images[0], { transform: 'translateY(0%)'});
 
-textItems.forEach((text, i) => {
-  ScrollTrigger.create({
-    trigger: text,
-    start: "top center",
-    end: "bottom center",
-    onEnter: () => showImage(i),
-    onEnterBack: () => showImage(i),
-  });
-});
+            const timeline = gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.section_benefits',
+                    pin: '.benefits-container',
+                    start: 'top top',
+                    end: '+=200%',
+                    scrub: 1,
+                },
+            });
 
-function showImage(index) {
-  imgItems.forEach((img, i) => {
-    gsap.to(img, {
-      opacity: i === index ? 1 : 0,
-      y: i === index ? 0 : -50,
-      duration: 0.6,
-      ease: "power2.out",
-    });
-  });
-}
+            images.forEach((image, index) => {
+                if (index === 0) return;
+
+                timeline
+                    .to(image, { 
+                        y: '0%', 
+                        duration: 1, 
+                        ease: 'power1.out' 
+                    })
+                    .to(texts[index - 1], { 
+                        opacity: 0, 
+                        y: '-4rem', 
+                        duration: 0.75,
+                        ease: 'power1.out' 
+                    }, '<')
+                    .to(texts[index], { 
+                        opacity: 1, 
+                        y: '0rem', 
+                        duration: 0.75,
+                        ease: 'power1.out' 
+                    }, '<+=0.5');
+            });
 
 /* Testimonials Marquee */
 function initMarqueeScrollDirection() {
