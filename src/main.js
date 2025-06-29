@@ -608,3 +608,73 @@ function initAccordionCSS() {
     });
 }
 initAccordionCSS();
+
+/* Open Form Modal */
+document.addEventListener("DOMContentLoaded", () => {
+  const formTriggers = document.querySelectorAll('[open-form]');
+  const formOverlay = document.querySelector(".form-overlay"); 
+  const formModalContent = document.querySelector(".form");
+
+  if (!formTriggers.length || !formOverlay || !formModalContent) {
+    console.warn("Form modal elements not found. Script will not run.");
+    return;
+  }
+
+  function openFormScrollLock() {
+    if (window.lenis) {
+      window.lenis.stop();
+    }
+  }
+
+  function closeFormScrollLock() {
+    if (window.lenis) {
+      window.lenis.start();
+    }
+  }
+
+  function hideFormOverlay() {
+    gsap.to(formModalContent, {
+      yPercent: 50,
+      autoAlpha: 0,
+      duration: 0.6,
+      ease: "power3.in",
+      onComplete: () => {
+        gsap.set(formOverlay, { display: "none" });
+        closeFormScrollLock();
+      },
+    });
+  }
+  
+  formTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      gsap.set(formOverlay, { display: "block" });
+      openFormScrollLock();
+
+      gsap.fromTo(
+        formModalContent,
+        {
+          yPercent: 50,
+          autoAlpha: 0,
+        },
+        {
+          yPercent: 0,
+          autoAlpha: 1,
+          duration: 0.75,
+          ease: "power3.out",
+        }
+      );
+    });
+  });
+
+  formOverlay.addEventListener("click", (e) => {
+    if (e.target.closest(".close-form-btn") || e.target === formOverlay) {
+      hideFormOverlay();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && window.getComputedStyle(formOverlay).display !== "none") {
+      hideFormOverlay();
+    }
+  });
+});
