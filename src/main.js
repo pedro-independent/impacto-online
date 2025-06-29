@@ -203,7 +203,6 @@ headings.forEach((heading) => {
 /* About animation */
 ScrollTrigger.matchMedia({
 
-  // Desktop animation (screens wider than 767px)
   "(min-width: 768px)": function() {
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -224,7 +223,6 @@ ScrollTrigger.matchMedia({
     tl.to(".about-img-wrap.is--five", { rotate: -2.5, xPercent: -250, yPercent: -50, ease: "power2.out" }, "<");
   },
 
-  // Mobile animation (screens 767px and narrower)
   "(max-width: 767px)": function() {
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -238,7 +236,6 @@ ScrollTrigger.matchMedia({
 
     tl.fromTo(".about-wrap", { scale: 0.4 }, { scale: 1, ease: "power2.out" });
 
-    // The only change here is xPercent is now 300 for all items
     tl.to(".about-img-wrap.is--one", { rotate: -3, xPercent: -300, yPercent: -200, ease: "power2.out" }, "<");
     tl.to(".about-img-wrap.is--two", { rotate: 3, xPercent: 300, yPercent: -170, ease: "power2.out" }, "<");
     tl.to(".about-img-wrap.is--three", { rotate: -6, xPercent: 300, yPercent: 100, ease: "power2.out" }, "<");
@@ -605,7 +602,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function hideFormOverlay() {
     gsap.to(formModalContent, {
-      yPercent: 50,
+      yPercent: 100,
       autoAlpha: 0,
       duration: 0.6,
       ease: "power3.in",
@@ -624,7 +621,7 @@ document.addEventListener("DOMContentLoaded", () => {
       gsap.fromTo(
         formModalContent,
         {
-          yPercent: 50,
+          yPercent: 100,
           autoAlpha: 0,
         },
         {
