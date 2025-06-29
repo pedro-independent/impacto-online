@@ -1,6 +1,72 @@
 import "./styles/style.css";
 import SplitType from "split-type";
 
+function initWelcomingWordsLoader() {
+  const loadingContainer = document.querySelector('[data-loading-container]');
+  if (!loadingContainer) return;
+
+  // --- Main Logic: Check sessionStorage ---
+  // If 'loaderShown' is found in sessionStorage, hide the container and exit.
+  if (sessionStorage.getItem('loaderShown')) {
+    gsap.set(loadingContainer, { display: 'none' });
+    return;
+  }
+
+  // --- If we reach here, it's the first load of the session. ---
+  
+  // Make the loader visible before starting the animation
+  gsap.set(loadingContainer, { display: 'block' });
+
+  const loadingWords = loadingContainer.querySelector('[data-loading-words]');
+  const wordsTarget = loadingWords.querySelector('[data-loading-words-target]');
+  const words = loadingWords.getAttribute('data-loading-words').split(',').map(w => w.trim());
+
+  const tl = gsap.timeline({
+    // Add an onComplete callback to the whole timeline
+    onComplete: () => {
+      // Once the entire animation is finished, set the flag in sessionStorage.
+      sessionStorage.setItem('loaderShown', 'true');
+      console.log("Loader animation complete. Session flag set.");
+    }
+  });
+
+  tl.set(loadingWords, {
+    yPercent: 50
+  });
+
+  tl.to(loadingWords, {
+    opacity: 1,
+    yPercent: 0,
+    duration: 1,
+    ease: "expo.inOut"
+  });
+
+  words.forEach(word => {
+    tl.to(wordsTarget, {
+      duration: 0.25, // A small duration for the text to "hold"
+      onStart: () => { // Use onStart to change the text content precisely
+        wordsTarget.textContent = word;
+      }
+    });
+  });
+
+  tl.to(loadingWords, {
+    opacity: 0,
+    yPercent: -75,
+    duration: 0.8,
+    ease: "expo.in"
+  }, "+=0.25"); // Add a slight delay after the last word
+
+  tl.to(loadingContainer, {
+    autoAlpha: 0, // autoAlpha handles both opacity and visibility
+    duration: 0.6,
+    ease: "power1.inOut"
+  }, "-=0.2"); // Overlap this animation slightly with the previous one
+}
+
+// Run the loader logic when the DOM is ready.
+document.addEventListener("DOMContentLoaded", initWelcomingWordsLoader);
+
 /* Check Section Theme on scroll */
 function initCheckSectionThemeScroll() {
   const navBarHeight = document.querySelector("[data-nav-bar-height]");
@@ -71,6 +137,51 @@ function initButtonCharacterStagger() {
 
 initButtonCharacterStagger();
 
+/* Mobile Menu */
+function initCenteredScalingNavigationBar() {
+  const navigationInnerItems = document.querySelectorAll("[data-navigation-item]")
+  
+  // Apply CSS transition delay
+  navigationInnerItems.forEach((item, index)=> {
+      item.style.transitionDelay = `${index * 0.05}s`;
+  });
+  
+  // Toggle Navigation
+  document.querySelectorAll('[data-navigation-toggle="toggle"]').forEach(toggleBtn => {
+    toggleBtn.addEventListener('click', () => {
+      const navStatusEl = document.querySelector('[data-navigation-status]');
+      if (!navStatusEl) return;
+      if (navStatusEl.getAttribute('data-navigation-status') === 'not-active') {
+        navStatusEl.setAttribute('data-navigation-status', 'active');
+      } else {
+        navStatusEl.setAttribute('data-navigation-status', 'not-active');
+      }
+    });
+  });
+
+  // Close Navigation
+  document.querySelectorAll('[data-navigation-toggle="close"]').forEach(closeBtn => {
+    closeBtn.addEventListener('click', () => {
+      const navStatusEl = document.querySelector('[data-navigation-status]');
+      if (!navStatusEl) return;
+      navStatusEl.setAttribute('data-navigation-status', 'not-active');
+    });
+  });
+
+  // Key ESC - Close Navigation
+  document.addEventListener('keydown', e => {
+    if (e.keyCode === 27) {
+      const navStatusEl = document.querySelector('[data-navigation-status]');
+      if (!navStatusEl) return;
+      if (navStatusEl.getAttribute('data-navigation-status') === 'active') {
+        navStatusEl.setAttribute('data-navigation-status', 'not-active');
+      }
+    }
+  });
+}
+
+  initCenteredScalingNavigationBar();
+
 /* Register GSAP */
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
@@ -89,7 +200,7 @@ headings.forEach((heading) => {
         ease: "power3.out",
         scrollTrigger: {
           trigger: heading,
-          start: "top 75%",
+          start: "top 85%",
           once: true,
         },
       });
@@ -189,7 +300,6 @@ function initStickyTitleScroll() {
       overlapOffset = 0.15;
 
     headings.forEach((heading, index) => {
-      // Set aria-label for accessibility
       heading.setAttribute("aria-label", heading.textContent);
 
       // Split text using SplitType
@@ -237,7 +347,7 @@ initStickyTitleScroll();
 const images = gsap.utils.toArray('.benefits-img');
             const texts = gsap.utils.toArray('.benefits-text-item');
 
-            gsap.set(texts.slice(1), { opacity: 0, y: '2rem' });
+            gsap.set(texts.slice(1), { opacity: 0, y: '4rem' });
             gsap.set(texts[0], { opacity: 1, y: '0rem' });
             gsap.set(images[0], { transform: 'translateY(0%)'});
 
@@ -381,14 +491,14 @@ initMarqueeScrollDirection();
 /* Team Overlay */
 const teamItems = document.querySelectorAll(".team-item");
 const overlay = document.querySelector(".team-overlay");
-const closeIcon = document.querySelector(".close-modal-btn");
+
 
 function openModal() {
-  lenis.stop();
+  if (window.lenis) lenis.stop();
 }
 
 function closeModal() {
-  lenis.start();
+  if (window.lenis) lenis.start();
 }
 
 function hideOverlay() {
@@ -396,18 +506,19 @@ function hideOverlay() {
 
   if (activeBio) {
     gsap.to(activeBio, {
-      y: "100vh",
-      duration: 0.75,
-      ease: "power3.out",
+      yPercent: 50,
+      autoAlpha: 0,
+      duration: 0.6,
+      ease: "power3.in",
       onComplete: () => {
-        activeBio.classList.remove("active");
         gsap.set(overlay, { display: "none" });
-        gsap.set(activeBio, { clearProps: "y" });
+        gsap.set(activeBio, { display: 'none' });
+        activeBio.classList.remove("active");
         closeModal();
       },
     });
   } else {
-    gsap.set(overlay, { display: "none" });
+    gsap.set(overlay, { display: "none"});
     closeModal();
   }
 }
@@ -416,52 +527,50 @@ teamItems.forEach((item) => {
   item.addEventListener("click", () => {
     const name = item.getAttribute("data-name");
     const allBios = overlay.querySelectorAll(".team-bio-item");
-
-    gsap.set(overlay, { display: "block" });
-    openModal();
-
-    allBios.forEach((bio) => {
-      gsap.set(bio, { y: "100vh" });
-      bio.classList.remove("active");
-    });
-
     const targetBio = overlay.querySelector(
       `.team-bio-item[data-name="${name}"]`
     );
-    if (targetBio) {
-      targetBio.classList.add("active");
-      gsap.to(targetBio, {
-        y: 0,
+
+    if (!targetBio) {
+      console.warn(`No team-bio-item found with data-name="${name}"`);
+      return;
+    }
+    
+    allBios.forEach((bio) => {
+      gsap.set(bio, { display: 'none' });
+      bio.classList.remove('active');
+    });
+
+    targetBio.classList.add('active');
+    gsap.set(overlay, { display: 'block' });
+    openModal();
+
+    gsap.fromTo(
+      targetBio,
+      {
+        display: 'block',
+        yPercent: 50,
+        autoAlpha: 0,
+      },
+      {
+        yPercent: 0,
+        autoAlpha: 1,
         duration: 0.75,
         ease: "power3.out",
-      });
-    }
+      }
+    );
   });
 });
 
 overlay.addEventListener("click", (e) => {
-  if (e.target.closest(".team-bio-item")) return;
-  hideOverlay();
-});
-
-overlay.addEventListener("click", (e) => {
-  if (e.target.closest(".close-modal-btn")) {
-    hideOverlay();
-    return;
-  }
-
-  if (!e.target.closest(".team-bio-item")) {
+  if (e.target.closest(".close-modal-btn") || e.target === overlay) {
     hideOverlay();
   }
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    const isOverlayVisible =
-      window.getComputedStyle(overlay).display !== "none";
-    if (isOverlayVisible) {
-      hideOverlay();
-    }
+  if (e.key === "Escape" && window.getComputedStyle(overlay).display !== "none") {
+    hideOverlay();
   }
 });
 
@@ -475,10 +584,10 @@ function initAccordionCSS() {
 
       accordion.addEventListener("click", (event) => {
         const toggle = event.target.closest("[data-accordion-toggle]");
-        if (!toggle) return; // Exit if the clicked element is not a toggle
+        if (!toggle) return; 
 
         const singleAccordion = toggle.closest("[data-accordion-status]");
-        if (!singleAccordion) return; // Exit if no accordion container is found
+        if (!singleAccordion) return; 
 
         const isActive =
           singleAccordion.getAttribute("data-accordion-status") === "active";
@@ -487,7 +596,6 @@ function initAccordionCSS() {
           isActive ? "not-active" : "active"
         );
 
-        // When [data-accordion-close-siblings="true"]
         if (closeSiblings && !isActive) {
           accordion
             .querySelectorAll('[data-accordion-status="active"]')
