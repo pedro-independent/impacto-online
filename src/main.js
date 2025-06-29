@@ -5,16 +5,11 @@ function initWelcomingWordsLoader() {
   const loadingContainer = document.querySelector('[data-loading-container]');
   if (!loadingContainer) return;
 
-  // --- Main Logic: Check sessionStorage ---
-  // If 'loaderShown' is found in sessionStorage, hide the container and exit.
   if (sessionStorage.getItem('loaderShown')) {
     gsap.set(loadingContainer, { display: 'none' });
     return;
   }
 
-  // --- If we reach here, it's the first load of the session. ---
-  
-  // Make the loader visible before starting the animation
   gsap.set(loadingContainer, { display: 'block' });
 
   const loadingWords = loadingContainer.querySelector('[data-loading-words]');
@@ -22,9 +17,7 @@ function initWelcomingWordsLoader() {
   const words = loadingWords.getAttribute('data-loading-words').split(',').map(w => w.trim());
 
   const tl = gsap.timeline({
-    // Add an onComplete callback to the whole timeline
     onComplete: () => {
-      // Once the entire animation is finished, set the flag in sessionStorage.
       sessionStorage.setItem('loaderShown', 'true');
       console.log("Loader animation complete. Session flag set.");
     }
@@ -43,8 +36,8 @@ function initWelcomingWordsLoader() {
 
   words.forEach(word => {
     tl.to(wordsTarget, {
-      duration: 0.25, // A small duration for the text to "hold"
-      onStart: () => { // Use onStart to change the text content precisely
+      duration: 0.25,
+      onStart: () => {
         wordsTarget.textContent = word;
       }
     });
@@ -55,16 +48,15 @@ function initWelcomingWordsLoader() {
     yPercent: -75,
     duration: 0.8,
     ease: "expo.in"
-  }, "+=0.25"); // Add a slight delay after the last word
+  }, "+=0.25");
 
   tl.to(loadingContainer, {
-    autoAlpha: 0, // autoAlpha handles both opacity and visibility
+    autoAlpha: 0,
     duration: 0.6,
     ease: "power1.inOut"
-  }, "-=0.2"); // Overlap this animation slightly with the previous one
+  }, "-=0.2");
 }
 
-// Run the loader logic when the DOM is ready.
 document.addEventListener("DOMContentLoaded", initWelcomingWordsLoader);
 
 /* Check Section Theme on scroll */
@@ -209,73 +201,52 @@ headings.forEach((heading) => {
 });
 
 /* About animation */
-const tl = gsap.timeline({
-  scrollTrigger: {
-    trigger: ".section_about",
-    start: "top top",
-    end: "+=100%",
-    scrub: 1,
-    pin: true,
-    //markers: true,
+ScrollTrigger.matchMedia({
+
+  // Desktop animation (screens wider than 767px)
+  "(min-width: 768px)": function() {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".section_about",
+        start: "top top",
+        end: "+=100%",
+        scrub: 1,
+        pin: true,
+      },
+    });
+
+    tl.fromTo(".about-wrap", { scale: 0.4 }, { scale: 1, ease: "power2.out" });
+
+    tl.to(".about-img-wrap.is--one", { rotate: -3, xPercent: -150, yPercent: -200, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--two", { rotate: 3, xPercent: 105, yPercent: -170, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--three", { rotate: -6, xPercent: 150, yPercent: 100, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--four", { rotate: 2, xPercent: -185, yPercent: 100, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--five", { rotate: -2.5, xPercent: -250, yPercent: -50, ease: "power2.out" }, "<");
   },
+
+  // Mobile animation (screens 767px and narrower)
+  "(max-width: 767px)": function() {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".section_about",
+        start: "top top",
+        end: "+=100%",
+        scrub: 1,
+        pin: true,
+      },
+    });
+
+    tl.fromTo(".about-wrap", { scale: 0.4 }, { scale: 1, ease: "power2.out" });
+
+    // The only change here is xPercent is now 300 for all items
+    tl.to(".about-img-wrap.is--one", { rotate: -3, xPercent: -300, yPercent: -200, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--two", { rotate: 3, xPercent: 300, yPercent: -170, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--three", { rotate: -6, xPercent: 300, yPercent: 100, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--four", { rotate: 2, xPercent: -300, yPercent: 100, ease: "power2.out" }, "<");
+    tl.to(".about-img-wrap.is--five", { rotate: -2.5, xPercent: -300, yPercent: -50, ease: "power2.out" }, "<");
+  }
+
 });
-
-tl.fromTo(".about-wrap", { scale: 0.4 }, { scale: 1, ease: "power2.out" });
-
-tl.to(
-  ".about-img-wrap.is--one",
-  {
-    rotate: -3,
-    xPercent: -150,
-    yPercent: -200,
-    ease: "power2.out",
-  },
-  "<"
-);
-
-tl.to(
-  ".about-img-wrap.is--two",
-  {
-    rotate: 3,
-    xPercent: 105,
-    yPercent: -170,
-    ease: "power2.out",
-  },
-  "<"
-);
-
-tl.to(
-  ".about-img-wrap.is--three",
-  {
-    rotate: -6,
-    xPercent: 150,
-    yPercent: 100,
-    ease: "power2.out",
-  },
-  "<"
-);
-
-tl.to(
-  ".about-img-wrap.is--four",
-  {
-    rotate: 2,
-    xPercent: -185,
-    yPercent: 100,
-    ease: "power2.out",
-  },
-  "<"
-);
-
-tl.to(
-  ".about-img-wrap.is--five",
-  {
-    rotate: -2.5,
-    xPercent: -250,
-    yPercent: -50,
-    ease: "power2.out",
-  },
-  "<"
-);
 
 /* Why animation */
 function initStickyTitleScroll() {
