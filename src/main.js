@@ -209,7 +209,7 @@ ScrollTrigger.matchMedia({
         trigger: ".section_about",
         start: "top top",
         end: "+=100%",
-        scrub: 1,
+        scrub: true,
         pin: true,
       },
     });
@@ -229,7 +229,7 @@ ScrollTrigger.matchMedia({
         trigger: ".section_about",
         start: "top top",
         end: "+=100%",
-        scrub: 1,
+        scrub: true,
         pin: true,
       },
     });
@@ -324,7 +324,7 @@ const images = gsap.utils.toArray('.benefits-img');
                     trigger: '.section_benefits',
                     pin: '.benefits-container',
                     start: 'top top',
-                    end: '+=200%',
+                    end: '+=300%',
                     scrub: 1,
                 },
             });
@@ -578,16 +578,13 @@ function initAccordionCSS() {
 initAccordionCSS();
 
 /* Open Form Modal */
-document.addEventListener("DOMContentLoaded", () => {
-  const formTriggers = document.querySelectorAll('[open-form]');
-  const formOverlay = document.querySelector(".form-overlay"); 
-  const formModalContent = document.querySelector(".form");
+const formTriggers = document.querySelectorAll('[open-form]');
+const formOverlay = document.querySelector(".form-overlay"); 
+const formModalContent = document.querySelector(".form");
 
-  if (!formTriggers.length || !formOverlay || !formModalContent) {
-    console.warn("Form modal elements not found. Script will not run.");
-    return;
-  }
-
+if (!formTriggers.length || !formOverlay || !formModalContent) {
+  console.warn("Form modal elements not found. Script will not run.");
+} else {
   function openFormScrollLock() {
     if (window.lenis) {
       window.lenis.stop();
@@ -601,8 +598,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function hideFormOverlay() {
+    // Directly target the form content, no need to look for an .active class
     gsap.to(formModalContent, {
-      yPercent: 100,
+      yPercent: 50,
       autoAlpha: 0,
       duration: 0.6,
       ease: "power3.in",
@@ -615,13 +613,15 @@ document.addEventListener("DOMContentLoaded", () => {
   
   formTriggers.forEach((trigger) => {
     trigger.addEventListener("click", () => {
+      // No need to add .active class
       gsap.set(formOverlay, { display: "block" });
       openFormScrollLock();
 
       gsap.fromTo(
         formModalContent,
         {
-          yPercent: 100,
+          display: 'block',
+          yPercent: 50,
           autoAlpha: 0,
         },
         {
@@ -645,4 +645,4 @@ document.addEventListener("DOMContentLoaded", () => {
       hideFormOverlay();
     }
   });
-});
+}
