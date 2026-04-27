@@ -19,6 +19,7 @@ function initWelcomingWordsLoader() {
   const tl = gsap.timeline({
     onComplete: () => {
       sessionStorage.setItem('loaderShown', 'true');
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
       console.log("Loader animation complete. Session flag set.");
     }
   });
@@ -58,6 +59,10 @@ function initWelcomingWordsLoader() {
 }
 
 document.addEventListener("DOMContentLoaded", initWelcomingWordsLoader);
+
+window.addEventListener("load", () => {
+  if (window.ScrollTrigger) ScrollTrigger.refresh();
+});
 
 /* Check Section Theme on scroll */
 function initCheckSectionThemeScroll() {
@@ -670,22 +675,21 @@ if (!formTriggers.length || !formOverlay || !formModalContent) {
   }
 
   function hideFormOverlay() {
-    // Directly target the form content, no need to look for an .active class
     gsap.to(formModalContent, {
-      yPercent: 50,
+      y: 40,
       autoAlpha: 0,
       duration: 0.6,
       ease: "power3.in",
+      overwrite: "auto",
       onComplete: () => {
         gsap.set(formOverlay, { display: "none" });
         closeFormScrollLock();
       },
     });
   }
-  
+
   formTriggers.forEach((trigger) => {
     trigger.addEventListener("click", () => {
-      // No need to add .active class
       gsap.set(formOverlay, { display: "block" });
       openFormScrollLock();
 
@@ -693,14 +697,15 @@ if (!formTriggers.length || !formOverlay || !formModalContent) {
         formModalContent,
         {
           display: 'block',
-          yPercent: 50,
+          y: 40,
           autoAlpha: 0,
         },
         {
-          yPercent: 0,
+          y: 0,
           autoAlpha: 1,
           duration: 0.75,
           ease: "power3.out",
+          overwrite: "auto",
         }
       );
     });
